@@ -1,0 +1,9 @@
+this dir contains differnt vel model for diffent usage
+
+models:
+- *.pierce, models for cal piercing point, contains 3 cols: thickness vp vs
+- *.tvel, models from TauP/StdModels, contains 3 cols : depth vp vs rho
+
+
+scipts:
+- mod.pl : change models from depth vp vs rho to thickness vp vs.

@@ -1,0 +1,18 @@
+this dir contains scripts required by other scripts:
+
+all calculation is divided to classes from A-D:
+
+A for interface(surface, out most), and D for bottom(some functions, convinience )
+
+* A_pierce.pl: calculate piercing point.
+* D_sep.pl: seperate 3col file into different file according to 2nd col. Lines should be sorted according to 2nd col like `sort -nk2 xxx.lst`
+
+Guild lines:
+
+
+A_pierce.pl:
+
+1. if piercing point seems unreliable, two method may be effective:
+    a. check your velocity model
+    b. swap if in function delta, and swap back
+2. deltailed usage guild line is in scripts
