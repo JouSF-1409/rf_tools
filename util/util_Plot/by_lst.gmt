@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# read sac trace from list file with 3 cols
+# file    value    on off switch
+
+list=$1
+awk '{if($3>0){print $1}}' $list > tmp.lst
+n=`cat tmp.lst|wc -l| awk '{print $1+2}'`
+max=0.3
+length=`echo "$max*$n"|bc`
+time_window="-1.5/30"
+echo $length
+
+# setting axis
+Bv=-BWSrt
+Bxi=-Bxa5f1+l"Trace"
+Byi=-Bya5f1+l"Time(s)"
+
+gmt begin $list png,pdf
+    gmt basemap -JX${length}c/-7.5c -R0/$n/${time_window} \
+        $Bv $Bxi $Byi
+    cat tmp.lst |gmt sac -R0/$n/-1.5/50 -En1 -Q \
+        -M$max -W0.05p \
+        -Gp+ggray -Gn+gSTEELBLUE1
+gmt end
+
+rm temp.lst

@@ -8,7 +8,7 @@ use File::Basename;
 
 my ($min,$step,$file) = @ARGV;
 open( my $ORI,"<",$file);
-my $basefile = dirname($file)."/split_";
+my $basefile = "split_";
 open(my $OUTPUT,">>",$basefile."${min}_.lst");
 print $basefile;
 

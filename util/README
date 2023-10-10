@@ -1,4 +1,4 @@
-this dir contains scripts for 
+This dir contains scripts for
 
 * Plot : regular images in rf, requires gmt 5.0 or above
 * gen_info : append info to sac_header, requires sachd,sac...(you can find them from repositories on github names sac_tools)
