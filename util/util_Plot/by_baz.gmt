@@ -1,0 +1,65 @@
+# plot traces which sorted by rayp
+# rayp stored in user0 with s/km, trans from s/deg /111.2
+# using rf.lst in station dir which has 3 cols to reprecent pick or not
+# filename reprecent on_off_switch
+
+function plot_by_baz_main(){
+    station=$1
+    cd $station
+    station=`basename $station`
+
+    split_and_stack_by_rayp
+
+    by_baz_gmt $? -Eu1
+    #by_rayp_gmt $?
+    rm junk?.* 
+    cd ../
+}
+
+function split_and_stack_by_baz(){
+    #gen files with  filename || rayp || pick or not to measure max and min of rayp
+    # default suffix of rf is ri
+    sort rf.lst > junk2.dat
+    saclst baz f *ri |sort  > junk1.lst
+    # in case p($2) = 0 or no p
+    join junk1.lst junk2.dat |awk '{if($4>0 && $2>0){print $1" "$2" "$4}}'|sort -nk 2 >junk3.dat
+    min=`cat junk3.dat|head -n1 |awk '{print $2}'`
+    step=5
+    perl $tools_dir/util/util_cals/A_sep.pl $min $step junk3.dat
+    # stack rfs if needed
+    for file in `ls split_*.lst`;do
+        cut -d" " -f1 $file|sacStack -O${file}.rf
+        average=$(awk 'BEGIN{sum=0}{sum += $2} END {print sum/NR}' $file)
+        sachd user1 $average f $file.rf
+    done
+    rm junk?.lst
+    saclst user1 f split*.rf >junk4.lst
+    return "junk4.lst"
+
+}
+
+function by_baz_gmt(){
+    # gmt part
+    # carefull dealing with R and -G of gmt sac
+    rf_list=$1;
+    EMark=$2
+    R=`awk '{print $2}' $rf_list|gmt info -C|\
+        awk '{gap=0.5*($2-$1);
+            printf "-R%f/%f/-1/30",$1-gap,$2+gap}'`
+    J=-JX8.5c/-15c
+    Bv=-BWSen
+    #B=-BWSrt
+    Bxi=-Bxa0.03f0.01+l'baz(degree)'
+    Byi=-Bya10f5+l"time(s)"
+
+    gmt begin by_rayp_$station png,pdf
+        gmt set FORMAT_FLOAT_OUT %0.2g
+        gmt basemap $R $J $Bv $Bxi $Byi
+        gmt sac split*.rf $EMark -Q \
+            -W0.5p -M0.01c\
+            -Gp+z0+g105 -Gn+z0+g0
+        
+    gmt end
+    # if stacked files are no longer needed, remove
+    cat $rf_list | xargs rm
+}
